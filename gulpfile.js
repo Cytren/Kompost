@@ -51,6 +51,7 @@ gulp.task("package:doc", function () {
 gulp.task("package:package.json", function () {
     return gulp.src('package.json')
         .pipe(json({
+            private: false,
             main: 'src/index.js',
             types: 'src/index.d.ts'
         }))
