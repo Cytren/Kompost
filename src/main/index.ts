@@ -30,12 +30,15 @@ import ContextProvider from "./context/context-provider";
 import BodyProvider from "./context/body-provider";
 import HeaderProvider from "./context/header-provider";
 import QueryProvider from "./context/query-provider";
+import ResponseError from "./response/response-error";
+import ValidationError from "./request/validation-error";
 
 export {
     Config, ConfigMiddleware, ConfigController, ConfigJob,
     ConfigEntity, Environment, Controller, Model, Middleware,
     Transformer, Request, Job, Context, Validation, ContextProvider,
-    BodyProvider, HeaderProvider, QueryProvider,
+    BodyProvider, HeaderProvider, QueryProvider, ValidationError,
+    ResponseError,
 
     provideSingleton, provideDynamic, removeProvider, bootstrap,
     controller, get, post, put, del, inject, request, transform,
