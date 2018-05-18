@@ -1,7 +1,6 @@
 
 import {Validation, validateAndTransform} from "kompost-validation";
 
-"kompost-validation";
 import ResponseError from "../response/response-error";
 import ValidationError from "./validation-error";
 import Context from "../context";
@@ -17,33 +16,6 @@ export default abstract class Request<M> {
         throw new ValidationError(message);
     }
 
-    validateRules () {
-        // const typeCount = (options: ValidateOptions[]) => {
-        //     let count = 0;
-        //     options.forEach(option => count += validTypes.includes(option) ? 1 : 0);
-        //     return count;
-        // };
-        //
-        // const process = (key: string, value: any) => {
-        //     if (!Array.isArray(value) && value instanceof Object) {
-        //         Object.entries(value).forEach(([subKey, value]) => {
-        //             process(`${key}.${subKey}`, value);
-        //         });
-        //
-        //         return;
-        //     }
-        //
-        //     const options: ValidateOptions[] = Array.isArray(value) ? value : [value];
-        //     const count = typeCount(options);
-        //
-        //     if (count > 1) {
-        //         throw new Error(`Conflicting validation types for ${key}`);
-        //     }
-        // };
-        //
-        // Object.entries(this.validation).forEach(([key, value]) => process(key, value));
-    }
-
     private getData () {
         return (this.context.method === "GET" || this.context.method === "DELETE") ?
             this.context.query :
@@ -51,7 +23,6 @@ export default abstract class Request<M> {
     }
 
     public async item (): Promise<M> {
-        this.validateRules();
         const data = this.getData();
 
         try {
@@ -65,8 +36,6 @@ export default abstract class Request<M> {
     }
 
     public async collection (): Promise<M[]> {
-        this.validateRules();
-
         const dataEntities = this.getData();
         const result: M[] = [];
 
