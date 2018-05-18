@@ -16,7 +16,7 @@ import {request} from "./request/request-decorator";
 import {transform} from "./transformer/transform-decorator";
 import {include} from "./transformer/include-decorator";
 
-import {Validation} from "./request/validation";
+import {Validation, ValidationItem, ValidationError} from "kompost-validation";
 
 import Environment from "./context/environment";
 import Controller from "./controller";
@@ -31,14 +31,13 @@ import BodyProvider from "./context/body-provider";
 import HeaderProvider from "./context/header-provider";
 import QueryProvider from "./context/query-provider";
 import ResponseError from "./response/response-error";
-import ValidationError from "./request/validation-error";
 
 export {
     Config, ConfigMiddleware, ConfigController, ConfigJob,
     ConfigEntity, Environment, Controller, Model, Middleware,
-    Transformer, Request, Job, Context, Validation, ContextProvider,
-    BodyProvider, HeaderProvider, QueryProvider, ValidationError,
-    ResponseError,
+    Transformer, Request, Job, Context, Validation, ValidationItem,
+    ContextProvider, BodyProvider, HeaderProvider, QueryProvider,
+    ResponseError, ValidationError,
 
     provideSingleton, provideDynamic, removeProvider, bootstrap,
     controller, get, post, put, del, inject, request, transform,
