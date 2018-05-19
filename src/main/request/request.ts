@@ -1,33 +1,37 @@
 
-import {Validation, validateAndTransform} from "kompost-validation";
+import {Validation, ValidationError, validateAndTransform} from "kompost-validation";
 
 import ResponseError from "../response/response-error";
-import ValidationError from "./validation-error";
 import Context from "../context";
+import {AnyObject} from "../core/type";
 
-export default abstract class Request<M> {
-    public abstract type: any;
-    protected abstract validation: Validation;
-    protected abstract validate (model: any): Promise<M>;
+export interface Request<M> {
+    readonly type: new () => M;
+    item (context: Context): Promise<M>;
+    collection (context: Context): Promise<M[]>;
+}
 
-    constructor (readonly context: Context) {}
+export class BasicRequest<M> implements Request<M> {
+    constructor (readonly type: new () => M,
+                 private validation: Validation,
+                 private thenHandler: (model: AnyObject, fail: (error: string) => void) => Promise<void>,
+                 private buildHandler: (model: AnyObject) => Promise<M>) {}
 
     protected fail (message: string) {
         throw new ValidationError(message);
     }
 
-    private getData () {
-        return (this.context.method === "GET" || this.context.method === "DELETE") ?
-            this.context.query :
-            this.context.request.body;
+    private getData ({ method, query, request }: Context) {
+        return (method === "GET" || method === "DELETE") ? query : request.body;
     }
 
-    public async item (): Promise<M> {
-        const data = this.getData();
+    public async item (context: Context): Promise<M> {
+        const data = this.getData(context);
 
         try {
             const model = validateAndTransform(this.validation, data);
-            return await this.validate(model);
+            await this.thenHandler(model, this.fail);
+            return await this.buildHandler(model);
         } catch (e) {
             if (!(e instanceof ValidationError)) { throw e; }
             const error = e as ValidationError;
@@ -35,8 +39,8 @@ export default abstract class Request<M> {
         }
     }
 
-    public async collection (): Promise<M[]> {
-        const dataEntities = this.getData();
+    public async collection (context: Context): Promise<M[]> {
+        const dataEntities = this.getData(context);
         const result: M[] = [];
 
         for (const [ index, data ] of dataEntities.entries()) {
@@ -44,7 +48,8 @@ export default abstract class Request<M> {
                 const model = validateAndTransform(this.validation, data);
 
                 try {
-                    result.push(await this.validate(model));
+                    await this.thenHandler(model, this.fail);
+                    result.push(await this.buildHandler(model));
                 } catch (e) {
                     if (!(e instanceof ValidationError)) { throw e; }
                     const error = e as ValidationError;

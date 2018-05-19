@@ -1,4 +1,6 @@
 
+import {Request} from "../";
+
 export const CONFIG_KEY = "$__controller__config__$";
 export type MethodType = "GET" | "POST" | "PUT" | "DELETE";
 
@@ -10,7 +12,7 @@ export interface ParameterConfig {
 export interface EndpointConfig {
     path: string;
     method: MethodType;
-    request?: Function;
+    request?: Request<any>;
     transformer?: Function;
     parameters?: ParameterConfig[];
 }

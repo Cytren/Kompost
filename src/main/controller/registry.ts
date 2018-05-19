@@ -2,11 +2,11 @@
 import * as KoaRouter from "koa-router";
 import {getControllerConfig} from "./config";
 import {getInjection} from "../injection/injector";
+import {Request} from "../request/request";
+import {ValidationError} from "kompost-validation";
 import Context from "../context";
 import Response from "../response/response";
 import ResponseError from "../response/response-error";
-import ValidationError from "../request/validation-error";
-import Request from "../request/request";
 import Transformer from "../transformer/transformer";
 import Paginated from "../response/paginated";
 import QueryProvider from "../context/query-provider";
@@ -40,10 +40,7 @@ export default function setupControllers (router: KoaRouter, controllers: Contro
 
             routerFunction(path, async (context: Context) => {
                 try {
-                    const request: Request<any> = endpointConfig.request ?
-                        new (endpointConfig.request as any)(context) :
-                        undefined;
-
+                    const request: Request<any> = endpointConfig.request;
                     const parameters = [];
 
                     for (let parameter of endpointConfig.parameters) {
@@ -79,13 +76,13 @@ export default function setupControllers (router: KoaRouter, controllers: Contro
 
                         // inject request item
                         if (request && parameter.type === request.type) {
-                            parameters.push(await request.item());
+                            parameters.push(await request.item(context));
                             continue;
                         }
 
                         // inject request collection
                         if (parameter.type === Array) {
-                            parameters.push(await request.collection());
+                            parameters.push(await request.collection(context));
                             continue;
                         }
 
