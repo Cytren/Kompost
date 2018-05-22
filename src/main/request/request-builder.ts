@@ -37,7 +37,7 @@ export class RequestBuilder<M> {
         return this;
     }
 
-    build (buildHandler?: (model: AnyObject) => Promise<M>): Request<M> {
+    build (buildHandler?: (model: AnyObject, fail: (error: string) => void) => Promise<M>): Request<M> {
         if (buildHandler) {
             this.buildHandler = buildHandler;
         }
