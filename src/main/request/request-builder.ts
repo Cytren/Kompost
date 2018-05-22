@@ -24,15 +24,11 @@ function createDefaultBuildHandler<M> (type: new () => M) {
     };
 }
 
-async function defaultThenHandler (model: AnyObject, fail: (error: string) => void) {}
-
 export class RequestBuilder<M> {
     private validation: Validation;
-    private thenHandler: (model: AnyObject, fail: (error: string) => void) => Promise<void>;
-    private buildHandler: (model: AnyObject) => Promise<M>;
+    private buildHandler: (model: AnyObject, fail: (error: string) => void) => Promise<M>;
 
     constructor (private type: new () => M) {
-        this.thenHandler = defaultThenHandler;
         this.buildHandler = createDefaultBuildHandler(type);
     }
 
@@ -41,16 +37,11 @@ export class RequestBuilder<M> {
         return this;
     }
 
-    then (thenHandler: (model: AnyObject, fail: (error: string) => void) => Promise<void>): RequestBuilder<M> {
-        this.thenHandler = thenHandler;
-        return this;
-    }
-
     build (buildHandler?: (model: AnyObject) => Promise<M>): Request<M> {
         if (buildHandler) {
             this.buildHandler = buildHandler;
         }
 
-        return new BasicRequest<M>(this.type, this.validation, this.thenHandler, this.buildHandler);
+        return new BasicRequest<M>(this.type, this.validation, this.buildHandler);
     }
 }

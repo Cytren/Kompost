@@ -14,8 +14,7 @@ export interface Request<M> {
 export class BasicRequest<M> implements Request<M> {
     constructor (readonly type: new () => M,
                  private validation: Validation,
-                 private thenHandler: (model: AnyObject, fail: (error: string) => void) => Promise<void>,
-                 private buildHandler: (model: AnyObject) => Promise<M>) {}
+                 private buildHandler: (model: AnyObject, fail: (error: string) => void) => Promise<M>) {}
 
     protected fail (message: string) {
         throw new ValidationError(message);
@@ -30,8 +29,7 @@ export class BasicRequest<M> implements Request<M> {
 
         try {
             const model = validateAndTransform(this.validation, data);
-            await this.thenHandler(model, this.fail);
-            return await this.buildHandler(model);
+            return await this.buildHandler(model, this.fail);
         } catch (e) {
             if (!(e instanceof ValidationError)) { throw e; }
             const error = e as ValidationError;
@@ -48,8 +46,7 @@ export class BasicRequest<M> implements Request<M> {
                 const model = validateAndTransform(this.validation, data);
 
                 try {
-                    await this.thenHandler(model, this.fail);
-                    result.push(await this.buildHandler(model));
+                    result.push(await this.buildHandler(model, this.fail));
                 } catch (e) {
                     if (!(e instanceof ValidationError)) { throw e; }
                     const error = e as ValidationError;
