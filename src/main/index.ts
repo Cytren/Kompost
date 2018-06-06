@@ -15,10 +15,10 @@ import {inject} from "./injection/injector";
 import {request} from "./request/request-decorator";
 import {transform} from "./transformer/transform-decorator";
 import {include} from "./transformer/include-decorator";
+import {createRequest} from "./request/request-builder";
 
 import {Validation, ValidationItem, ValidationError} from "kompost-validation";
 import {Request} from "./request/request";
-import {RequestBuilder} from "./request/request-builder";
 
 import Environment from "./context/environment";
 import Controller from "./controller";
@@ -38,9 +38,9 @@ export {
     ConfigEntity, Environment, Controller, Model, Middleware,
     Transformer, Request, Job, Context, Validation, ValidationItem,
     ContextProvider, BodyProvider, HeaderProvider, QueryProvider,
-    ResponseError, ValidationError, RequestBuilder,
+    ResponseError, ValidationError,
 
     provideSingleton, provideDynamic, removeProvider, bootstrap,
     controller, get, post, put, del, inject, request, transform,
-    include
+    include, createRequest
 };

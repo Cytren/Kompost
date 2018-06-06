@@ -27,32 +27,32 @@
   "dependencies": {
     "cron": "^1.3.0",
     "koa": "^2.5.1",
-    "koa-bodyparser": "^4.2.0",
+    "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.3.0",
     "koa-static": "^4.0.3",
     "kompost-validation": "^0.0.3",
-    "moment": "^2.22.1",
+    "moment": "^2.22.2",
     "mysql": "^2.15.0",
     "reflect-metadata": "^0.1.12",
-    "typeorm": "^0.2.6"
+    "typeorm": "^0.2.7"
   },
   "devDependencies": {
     "@types/chai": "^4.1.3",
     "@types/cron": "^1.3.0",
-    "@types/koa": "^2.0.45",
+    "@types/koa": "^2.0.46",
     "@types/koa-bodyparser": "^4.2.0",
     "@types/koa-router": "^7.0.28",
     "@types/koa-static": "^4.0.0",
-    "@types/mocha": "^5.2.0",
-    "@types/node": "^10.1.1",
+    "@types/mocha": "^5.2.1",
+    "@types/node": "^10.3.1",
     "chai": "^4.1.0",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-json-editor": "^2.4.1",
     "gulp-sequence": "^1.0.0",
     "gulp-typescript": "^4.0.2",
-    "mocha": "^5.1.1",
+    "mocha": "^5.2.0",
     "tslint": "^5.10.0",
-    "typescript": "^2.8.3"
+    "typescript": "^2.9.1"
   }
 }

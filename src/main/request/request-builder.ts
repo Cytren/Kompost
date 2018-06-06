@@ -1,7 +1,13 @@
 
 import {Validation} from "kompost-validation";
 import {AnyObject} from "../core/type";
-import {Request, BasicRequest} from "./request";
+import {Request, BasicRequest, FailHandler} from "./request";
+
+export interface CreateRequestOptions<M> {
+    validation?: Validation;
+    validate?: (model: AnyObject, fail: FailHandler) => Promise<void>;
+    build?: (model: AnyObject, fail: FailHandler) => Promise<M>;
+}
 
 function createDefaultBuildHandler<M> (type: new () => M) {
     return async (model: new () => M): Promise<M> => {
@@ -24,24 +30,11 @@ function createDefaultBuildHandler<M> (type: new () => M) {
     };
 }
 
-export class RequestBuilder<M> {
-    private validation: Validation;
-    private buildHandler: (model: AnyObject, fail: (error: string) => void) => Promise<M>;
-
-    constructor (private type: new () => M) {
-        this.buildHandler = createDefaultBuildHandler(type);
-    }
-
-    validate (validation: Validation): RequestBuilder<M> {
-        this.validation = validation;
-        return this;
-    }
-
-    build (buildHandler?: (model: AnyObject, fail: (error: string) => void) => Promise<M>): Request<M> {
-        if (buildHandler) {
-            this.buildHandler = buildHandler;
-        }
-
-        return new BasicRequest<M>(this.type, this.validation, this.buildHandler);
-    }
+export function createRequest<M> (type: new () => M, { validation, validate, build }: CreateRequestOptions<M>): Request<M> {
+    return new BasicRequest<M>(
+        type,
+        validation || {},
+        validate || (async () => {}),
+        build || createDefaultBuildHandler(type)
+    );
 }

@@ -5,6 +5,8 @@ import ResponseError from "../response/response-error";
 import Context from "../context";
 import {AnyObject} from "../core/type";
 
+export type FailHandler = (error: string) => void;
+
 export interface Request<M> {
     readonly type: new () => M;
     item (context: Context): Promise<M>;
@@ -12,11 +14,14 @@ export interface Request<M> {
 }
 
 export class BasicRequest<M> implements Request<M> {
-    constructor (readonly type: new () => M,
-                 private validation: Validation,
-                 private buildHandler: (model: AnyObject, fail: (error: string) => void) => Promise<M>) {}
+    constructor (
+        readonly type: new () => M,
+        readonly validation: Validation,
+        readonly validateHandler: (model: AnyObject, fail: FailHandler) => Promise<void>,
+        readonly buildHandler: (model: AnyObject, fail: FailHandler) => Promise<M>
+    ) {}
 
-    protected fail (message: string) {
+    private fail (message: string) {
         throw new ValidationError(message);
     }
 
@@ -29,6 +34,7 @@ export class BasicRequest<M> implements Request<M> {
 
         try {
             const model = validateAndTransform(this.validation, data);
+            await this.validateHandler(model, this.fail);
             return await this.buildHandler(model, this.fail);
         } catch (e) {
             if (!(e instanceof ValidationError)) { throw e; }
@@ -46,6 +52,7 @@ export class BasicRequest<M> implements Request<M> {
                 const model = validateAndTransform(this.validation, data);
 
                 try {
+                    await this.validateHandler(model, this.fail);
                     result.push(await this.buildHandler(model, this.fail));
                 } catch (e) {
                     if (!(e instanceof ValidationError)) { throw e; }
