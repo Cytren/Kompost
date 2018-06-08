@@ -2,11 +2,12 @@
 import {Validation} from "kompost-validation";
 import {AnyObject} from "../core/type";
 import {Request, BasicRequest, FailHandler} from "./index";
+import Context from "../context";
 
 export interface CreateRequestOptions<M> {
     validation?: Validation;
-    validate?: (model: AnyObject, fail: FailHandler) => Promise<void>;
-    build?: (model: AnyObject, fail: FailHandler) => Promise<M>;
+    validate?: (model: AnyObject, fail: FailHandler, context: Context) => Promise<void>;
+    build?: (model: AnyObject, fail: FailHandler, context: Context) => Promise<M>;
 }
 
 function createDefaultBuildHandler<M> (type: new () => M) {

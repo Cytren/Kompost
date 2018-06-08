@@ -18,7 +18,7 @@ import {include} from "./transformer/include-decorator";
 import {createRequest} from "./request/request-builder";
 
 import {Validation, ValidationItem, ValidationError} from "kompost-validation";
-import {Request} from "./request/index";
+import {Request} from "./request";
 
 import Environment from "./context/environment";
 import Controller from "./controller";
