@@ -1,6 +1,6 @@
 
 import {getEndpointConfig} from "../controller/config";
-import {Request} from "./request";
+import {Request} from "./index";
 
 export function request (request: Request<any>): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol) => {

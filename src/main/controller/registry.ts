@@ -2,7 +2,7 @@
 import * as KoaRouter from "koa-router";
 import {getControllerConfig} from "./config";
 import {getInjection} from "../injection/injector";
-import {Request} from "../request/request";
+import {Request} from "../request";
 import {ValidationError} from "kompost-validation";
 import Context from "../context";
 import Response from "../response/response";
@@ -13,6 +13,7 @@ import QueryProvider from "../context/query-provider";
 import HeaderProvider from "../context/header-provider";
 import BodyProvider from "../context/body-provider";
 import ContextProvider from "../context/context-provider";
+import ParamProvider from "../context/param-provider";
 
 export type Controller = Function;
 
@@ -59,6 +60,12 @@ export default function setupControllers (router: KoaRouter, controllers: Contro
                         // inject body
                         if (parameter.type === BodyProvider) {
                             parameters.push(new BodyProvider(context.request.body));
+                            continue;
+                        }
+
+                        // inject params
+                        if (parameter.type === ParamProvider) {
+                            parameters.push(new ParamProvider(context.params));
                             continue;
                         }
 

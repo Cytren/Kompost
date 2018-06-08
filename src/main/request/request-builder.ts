@@ -1,7 +1,7 @@
 
 import {Validation} from "kompost-validation";
 import {AnyObject} from "../core/type";
-import {Request, BasicRequest, FailHandler} from "./request";
+import {Request, BasicRequest, FailHandler} from "./index";
 
 export interface CreateRequestOptions<M> {
     validation?: Validation;
