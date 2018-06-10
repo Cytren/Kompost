@@ -1,8 +1,10 @@
 
 import {Request} from "../";
+import Context from "../context";
 
 export const CONFIG_KEY = "$__controller__config__$";
 export type MethodType = "GET" | "POST" | "PUT" | "DELETE";
+export type ExposeCondition = (context: Context) => boolean;
 
 export interface ParameterConfig {
     name: string;
@@ -15,6 +17,7 @@ export interface EndpointConfig {
     request?: Request<any>;
     transformer?: Function;
     parameters?: ParameterConfig[];
+    expose?: ExposeCondition;
 }
 
 export default interface ControllerConfig {

@@ -30,7 +30,7 @@ export default function setupControllers (router: KoaRouter, controllers: Contro
             const endpointPath = endpointConfig.path === "/" ? "" : endpointConfig.path;
             const path = `/${basePath}/${endpointPath}`;
 
-            let routerFunction: (path: string, handler: (context: Context) => Promise<void>) => void;
+            let routerFunction: (path: string, handler: (context: Context) => Promise<any>) => void;
 
             switch (endpointConfig.method) {
                 case "GET": routerFunction = router.get.bind(router); break;
@@ -40,117 +40,121 @@ export default function setupControllers (router: KoaRouter, controllers: Contro
             }
 
             routerFunction(path, async (context: Context) => {
-                try {
-                    const request: Request<any> = endpointConfig.request;
-                    const parameters = [];
+                const handler = async () => {
+                    try {
+                        const request: Request<any> = endpointConfig.request;
+                        const parameters = [];
 
-                    for (let parameter of endpointConfig.parameters) {
-                        // inject queries
-                        if (parameter.type === QueryProvider) {
-                            parameters.push(new QueryProvider(context.query));
-                            continue;
+                        for (let parameter of endpointConfig.parameters) {
+                            // inject queries
+                            if (parameter.type === QueryProvider) {
+                                parameters.push(new QueryProvider(context.query));
+                                continue;
+                            }
+
+                            // inject headers
+                            if (parameter.type === HeaderProvider) {
+                                parameters.push(new HeaderProvider(context.headers));
+                                continue;
+                            }
+
+                            // inject body
+                            if (parameter.type === BodyProvider) {
+                                parameters.push(new BodyProvider(context.request.body));
+                                continue;
+                            }
+
+                            // inject params
+                            if (parameter.type === ParamProvider) {
+                                parameters.push(new ParamProvider(context.params));
+                                continue;
+                            }
+
+                            // inject context
+                            if (parameter.type === ContextProvider) {
+                                parameters.push(new ContextProvider(context));
+                                continue;
+                            }
+
+                            // inject route parameter
+                            if (parameter.type === String) {
+                                parameters.push(context.params[parameter.name]);
+                                continue;
+                            }
+
+                            // inject request item
+                            if (request && parameter.type === request.type) {
+                                parameters.push(await request.item(context));
+                                continue;
+                            }
+
+                            // inject request collection
+                            if (parameter.type === Array) {
+                                parameters.push(await request.collection(context));
+                                continue;
+                            }
+
+                            // inject service
+                            try {
+                                parameters.push(getInjection(parameter.type));
+                                continue;
+                            } catch (e) {}
+
+                            throw new Error("Invalid parameters.");
                         }
 
-                        // inject headers
-                        if (parameter.type === HeaderProvider) {
-                            parameters.push(new HeaderProvider(context.headers));
-                            continue;
+                        const result = await endpoint(...parameters);
+
+                        if (result instanceof Response) {
+                            context.status = result.status;
+                            context.body = result.data;
                         }
 
-                        // inject body
-                        if (parameter.type === BodyProvider) {
-                            parameters.push(new BodyProvider(context.request.body));
-                            continue;
-                        }
+                        if (typeof result === "number") {
+                            context.status = result;
+                        } else if (endpointConfig.transformer) {
 
-                        // inject params
-                        if (parameter.type === ParamProvider) {
-                            parameters.push(new ParamProvider(context.params));
-                            continue;
-                        }
+                            const includeString: string = context.query["include"];
+                            const includes = includeString ? includeString.split(",") : [];
+                            const transformer: Transformer<any> = new (endpointConfig.transformer as any)(includes);
 
-                        // inject context
-                        if (parameter.type === ContextProvider) {
-                            parameters.push(new ContextProvider(context));
-                            continue;
-                        }
+                            if (result instanceof Paginated) {
+                                const data = await transformer.collection(result.data);
 
-                        // inject route parameter
-                        if (parameter.type === String) {
-                            parameters.push(context.params[parameter.name]);
-                            continue;
-                        }
-
-                        // inject request item
-                        if (request && parameter.type === request.type) {
-                            parameters.push(await request.item(context));
-                            continue;
-                        }
-
-                        // inject request collection
-                        if (parameter.type === Array) {
-                            parameters.push(await request.collection(context));
-                            continue;
-                        }
-
-                        // inject service
-                        try {
-                            parameters.push(getInjection(parameter.type));
-                            continue;
-                        } catch (e) {}
-
-                        throw new Error("Invalid parameters.");
-                    }
-
-                    const result = await endpoint(...parameters);
-
-                    if (result instanceof Response) {
-                        context.status = result.status;
-                        context.body = result.data;
-                    }
-
-                    if (typeof result === "number") {
-                        context.status = result;
-                    } else if (endpointConfig.transformer) {
-
-                        const includeString: string = context.query["include"];
-                        const includes = includeString ? includeString.split(",") : [];
-                        const transformer: Transformer<any> = new (endpointConfig.transformer as any)(includes);
-
-                        if (result instanceof Paginated) {
-                            const data = await transformer.collection(result.data);
-
-                            context.body = {
-                                start: result.start,
-                                count: result.data.length,
-                                left: result.left,
-                                total: result.total,
-                                data
-                            };
-                        } else if (Array.isArray(result)) {
-                            context.body = await transformer.collection(result);
+                                context.body = {
+                                    start: result.start,
+                                    count: result.data.length,
+                                    left: result.left,
+                                    total: result.total,
+                                    data
+                                };
+                            } else if (Array.isArray(result)) {
+                                context.body = await transformer.collection(result);
+                            } else {
+                                context.body = await transformer.item(result);
+                            }
                         } else {
-                            context.body = await transformer.item(result);
+                            context.body = result;
                         }
-                    } else {
-                        context.body = result;
-                    }
 
-                } catch (e) {
-                    if (e instanceof ValidationError) {
-                        context.status = 422;
-                        context.body = { error: e.value || {} };
-                        return;
-                    }
+                    } catch (e) {
+                        if (e instanceof ValidationError) {
+                            context.status = 422;
+                            context.body = { error: e.value || {} };
+                            return;
+                        }
 
-                    if (e instanceof ResponseError) {
-                        context.status = e.status;
-                        context.body = e.error || {};
-                        return;
-                    }
+                        if (e instanceof ResponseError) {
+                            context.status = e.status;
+                            context.body = e.error || {};
+                            return;
+                        }
 
-                    throw e;
-                }
+                        throw e;
+                    }
+                };
+
+                return { endpointConfig, handler };
             });
         });
     });

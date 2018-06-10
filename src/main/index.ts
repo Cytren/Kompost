@@ -15,6 +15,7 @@ import {inject} from "./injection/injector";
 import {request} from "./request/request-decorator";
 import {transform} from "./transformer/transform-decorator";
 import {include} from "./transformer/include-decorator";
+import {expose} from "./controller/expose-decorator";
 import {createRequest} from "./request/request-builder";
 
 import {Validation, ValidationItem, ValidationError} from "kompost-validation";
@@ -23,7 +24,7 @@ import {Request} from "./request";
 import Environment from "./context/environment";
 import Controller from "./controller";
 import Model from "./database/model";
-import Middleware from "./middleware";
+import Middleware, {MiddlewareResult} from "./middleware";
 import Transformer from "./transformer/transformer";
 import Job from "./job/index";
 import Context from "./context";
@@ -33,15 +34,17 @@ import HeaderProvider from "./context/header-provider";
 import QueryProvider from "./context/query-provider";
 import ParamProvider from "./context/param-provider";
 import ResponseError from "./response/response-error";
+import EndpointConfig from "./controller/config";
 
 export {
     Config, ConfigMiddleware, ConfigController, ConfigJob,
     ConfigEntity, Environment, Controller, Model, Middleware,
     Transformer, Request, Job, Context, Validation, ValidationItem,
     ContextProvider, BodyProvider, HeaderProvider, QueryProvider,
-    ParamProvider, ResponseError, ValidationError,
+    ParamProvider, ResponseError, ValidationError, MiddlewareResult,
+    EndpointConfig,
 
     provideSingleton, provideDynamic, removeProvider, bootstrap,
-    controller, get, post, put, del, inject, request, transform,
-    include, createRequest
+    createRequest, controller, get, post, put, del, inject, request,
+    transform, include, expose
 };
