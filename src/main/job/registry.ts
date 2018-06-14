@@ -1,15 +1,13 @@
 
 import Environment from "../context/environment";
-import JobItem from "./";
+import Job from "./";
 import {CronJob} from "cron";
 
-export type Job = Function;
-
-export default function setupJobs (environment: Environment, jobs: Job[]) {
+export default function setupJobs (environment: Environment, jobs: (new () => Job)[]) {
     const isDevMode = environment.environment === "development";
 
     jobs.forEach(jobFunction => {
-        const job: JobItem = new (jobFunction as any);
+        const job = new jobFunction;
 
         const run = () => {
             if (isDevMode) { console.log(`Started job ${job.name}`); }

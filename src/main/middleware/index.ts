@@ -2,11 +2,14 @@
 import Context from "../context";
 import {EndpointConfig} from "../controller/config";
 
-export interface MiddlewareResult {
-    handler: () => Promise<any>,
+export interface MiddlewareParams {
     endpointConfig: EndpointConfig
 }
 
 export default interface Middleware {
-    run (context: Context, start: () => Promise<MiddlewareResult>);
+    run (context: Context, next: () => Promise<void>, params: MiddlewareParams): Promise<void>;
 };
+
+export class MiddlewareProvider {
+    constructor (readonly middleware: Middleware[]) {}
+}

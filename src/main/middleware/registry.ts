@@ -1,17 +1,12 @@
 
 import * as KoaRouter from "koa-router";
-import MainMiddleware from "./main";
+import Middleware, {MiddlewareProvider} from "./"
+import {provideSingleton} from "../injection/providers";
 
-export type Middleware = Function;
-
-export default function setupMiddleware (router: KoaRouter, middleware: Middleware[]) {
-    if (middleware.length === 0) {
-        const mainMiddlware = new MainMiddleware();
-        router.use(mainMiddlware.run.bind(mainMiddlware));
-    }
-
-    middleware.forEach(item => {
-        const instance = new (item as any);
-        router.use(instance.run.bind(instance));
+export default function setupMiddleware (router: KoaRouter, middleware: (new () => Middleware)[]) {
+    const instances = middleware.map(item => {
+        return new item;
     });
+
+    provideSingleton(MiddlewareProvider, () => new MiddlewareProvider(instances));
 }

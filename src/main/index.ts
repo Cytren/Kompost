@@ -1,13 +1,7 @@
 
 import "reflect-metadata";
 
-import {Middleware as ConfigMiddleware} from "./middleware/registry";
-import {Controller as ConfigController} from "./controller/registry";
-import {Job as ConfigJob} from "./job/registry";
-import {Entity as ConfigEntity} from "./database/registry";
-
 import controller from "./controller/controller-decorator";
-
 import bootstrap, {Config} from "./core/bootstrap";
 import {provideDynamic, provideSingleton, remove as removeProvider} from "./injection/providers";
 import {get, post, put, del} from "./controller/endpoint-decorators";
@@ -18,13 +12,13 @@ import {include} from "./transformer/include-decorator";
 import {expose} from "./controller/expose-decorator";
 import {createRequest} from "./request/request-builder";
 
+import Middleware, {MiddlewareParams} from "./middleware";
 import {Validation, ValidationItem, ValidationError} from "kompost-validation";
 import {Request} from "./request";
 
 import Environment from "./context/environment";
 import Controller from "./controller";
 import Model from "./database/model";
-import Middleware, {MiddlewareResult} from "./middleware";
 import Transformer from "./transformer/transformer";
 import Job from "./job/index";
 import Context from "./context";
@@ -37,12 +31,11 @@ import ResponseError from "./response/response-error";
 import EndpointConfig from "./controller/config";
 
 export {
-    Config, ConfigMiddleware, ConfigController, ConfigJob,
-    ConfigEntity, Environment, Controller, Model, Middleware,
+    Config, Environment, Controller, Model, Middleware,
     Transformer, Request, Job, Context, Validation, ValidationItem,
     ContextProvider, BodyProvider, HeaderProvider, QueryProvider,
-    ParamProvider, ResponseError, ValidationError, MiddlewareResult,
-    EndpointConfig,
+    ParamProvider, ResponseError, ValidationError, EndpointConfig,
+    MiddlewareParams,
 
     provideSingleton, provideDynamic, removeProvider, bootstrap,
     createRequest, controller, get, post, put, del, inject, request,

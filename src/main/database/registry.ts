@@ -1,10 +1,9 @@
 
 import Environment from "../context/environment";
 import {ConnectionOptions, createConnection} from "typeorm";
+import Model from "./model";
 
-export type Entity = Function;
-
-export default async function setupDatabase (environment: Environment, entities: Entity[]) {
+export default async function setupDatabase (environment: Environment, models: (new () => Model)[]) {
     const options: ConnectionOptions = {
         type: "mysql",
         host: environment.mysql.host,
@@ -14,7 +13,7 @@ export default async function setupDatabase (environment: Environment, entities:
         database: environment.mysql.database,
         synchronize: true,
         logging: false,
-        entities,
+        entities: models,
     };
 
     await createConnection(options);

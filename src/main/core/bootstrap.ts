@@ -7,19 +7,24 @@ import * as KoaRouter from "koa-router";
 import * as serve from "koa-static";
 
 import Environment from "../context/environment";
+import Controller from "../controller";
+import Middleware from "../middleware";
+import Model from "../database/model";
+import Job from "../job";
+
 import {provideSingleton} from "../injection/providers";
 
-import setupMiddleware, {Middleware} from "../middleware/registry";
-import setupControllers, {Controller} from "../controller/registry";
-import setupJobs, {Job} from "../job/registry";
-import setupDatabase, {Entity} from "../database/registry";
+import setupMiddleware from "../middleware/registry";
+import setupControllers from "../controller/registry";
+import setupJobs from "../job/registry";
+import setupDatabase from "../database/registry";
 
 export interface Config {
     environment: Environment,
-    controllers: Controller[],
-    models: Entity[],
-    middleware: Middleware[],
-    jobs: Job[],
+    controllers: (new () => Controller)[],
+    models: (new () => Model)[],
+    middleware: (new () => Middleware)[],
+    jobs: (new () => Job)[],
 }
 
 export default async function bootstrap (config: Config) {

@@ -4,6 +4,7 @@ import {getControllerConfig} from "./config";
 import {getInjection} from "../injection/injector";
 import {Request} from "../request";
 import {ValidationError} from "kompost-validation";
+import {MiddlewareProvider} from "../middleware";
 import Context from "../context";
 import Response from "../response/response";
 import ResponseError from "../response/response-error";
@@ -14,13 +15,13 @@ import HeaderProvider from "../context/header-provider";
 import BodyProvider from "../context/body-provider";
 import ContextProvider from "../context/context-provider";
 import ParamProvider from "../context/param-provider";
+import Controller from "./";
 
-export type Controller = Function;
-
-export default function setupControllers (router: KoaRouter, controllers: Controller[]) {
+export default function setupControllers (router: KoaRouter, controllers: (new () => Controller)[]) {
+    const { middleware }: MiddlewareProvider = getInjection(MiddlewareProvider);
 
     controllers.forEach(controller => {
-        const controllerInstance = new (controller as any);
+        const controllerInstance = new controller;
         const config = getControllerConfig(controller);
         const basePath = config.path;
 
@@ -154,7 +155,15 @@ export default function setupControllers (router: KoaRouter, controllers: Contro
                     }
                 };
 
-                return { endpointConfig, handler };
+                // build next stack
+                let stack: (() => Promise<void>)[] = [ handler ];
+                const middlewareParams = { endpointConfig };
+
+                middleware.reverse().forEach((item, index) => {
+                    stack[index + 1] = async () => await item.run(context, stack[index], middlewareParams);
+                });
+
+                await stack[stack.length - 1]();
             });
         });
     });
