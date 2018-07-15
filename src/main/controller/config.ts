@@ -1,6 +1,7 @@
 
 import {Request} from "../";
 import Context from "../context";
+import Controller from "./index";
 
 export const CONFIG_KEY = "$__controller__config__$";
 export type MethodType = "GET" | "POST" | "PUT" | "DELETE";
@@ -23,6 +24,7 @@ export interface EndpointConfig {
 export default interface ControllerConfig {
     path: string;
     endpoints: { [functionName: string]: EndpointConfig };
+    children: (new () => Controller)[];
 }
 
 export function getControllerConfig (controller: Function): ControllerConfig {
@@ -31,6 +33,7 @@ export function getControllerConfig (controller: Function): ControllerConfig {
     if (!config) {
         config = {};
         config.endpoints = {};
+        config.children = [];
         controller[CONFIG_KEY] = config;
     }
 

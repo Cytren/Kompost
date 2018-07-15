@@ -20,7 +20,16 @@ import Controller from "./";
 export default function setupControllers (router: KoaRouter, controllers: (new () => Controller)[]) {
     const { middleware }: MiddlewareProvider = getInjection(MiddlewareProvider);
 
-    controllers.forEach(controller => {
+    const allControllers: (new () => Controller)[] = [];
+    const registerControllers = (controllers: (new () => Controller)[]) => {
+        controllers.forEach(controller => {
+            allControllers.push(controller);
+            registerControllers(getControllerConfig(controller).children);
+        });
+    };
+    registerControllers(controllers);
+
+    allControllers.forEach(controller => {
         const controllerInstance = new controller;
         const config = getControllerConfig(controller);
         const basePath = config.path;
