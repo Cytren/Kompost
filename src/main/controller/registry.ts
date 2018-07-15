@@ -109,9 +109,7 @@ export default function setupControllers (router: KoaRouter, controllers: (new (
                         if (result instanceof Response) {
                             context.status = result.status;
                             context.body = result.data;
-                        }
-
-                        if (typeof result === "number") {
+                        } else if (typeof result === "number") {
                             context.status = result;
                         } else if (endpointConfig.transformer) {
 

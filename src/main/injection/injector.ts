@@ -5,7 +5,7 @@ export function getInjection (type: any, nameOrNull?: string): any {
     const provider = getProvider(type, nameOrNull || "default");
 
     if (!provider) {
-        throw new Error(`No provider for ${type.name} named ${name}.`);
+        return;
     }
 
     if (provider.type === "dynamic") {
