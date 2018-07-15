@@ -11,6 +11,7 @@ import {transform} from "./transformer/transform-decorator";
 import {include} from "./transformer/include-decorator";
 import {expose} from "./controller/expose-decorator";
 import {createRequest} from "./request/request-builder";
+import {encrypt, decrypt} from "./core/encryption";
 
 import Middleware, {MiddlewareParams} from "./middleware";
 import {Validation, ValidationItem, ValidationError} from "kompost-validation";
@@ -39,5 +40,5 @@ export {
 
     provideSingleton, provideDynamic, removeProvider, bootstrap,
     createRequest, controller, get, post, put, del, inject, request,
-    transform, include, expose
+    transform, include, expose, encrypt, decrypt
 };

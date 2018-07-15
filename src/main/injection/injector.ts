@@ -2,7 +2,7 @@
 import {getProvider} from "./providers";
 
 export function getInjection (type: any, nameOrNull?: string): any {
-    const provider = getProvider(type, nameOrNull || "default");
+    const provider = getProvider(type, nameOrNull);
 
     if (!provider) {
         return;
