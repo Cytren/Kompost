@@ -1,18 +1,17 @@
 
 import {Validation} from "kompost-validation";
-import {AnyObject} from "../core/type";
 import {Request, BasicRequest, FailHandler} from "./index";
 import Context from "../context";
 
 export interface CreateRequestOptions<M> {
     validation?: Validation;
-    validate?: (model: AnyObject, fail: FailHandler, context: Context) => Promise<void>;
-    build?: (model: AnyObject, fail: FailHandler, context: Context) => Promise<M>;
+    validate?: (model: object, fail: FailHandler, context: Context) => Promise<void>;
+    build?: (model: object, fail: FailHandler, context: Context) => Promise<M>;
 }
 
 function createDefaultBuildHandler<M> (type: new () => M) {
     return async (model: new () => M): Promise<M> => {
-        const process = (model: AnyObject, result: AnyObject) => {
+        const process = <M> (model: new () => M, result: M) => {
             Object.entries(model)
                 .forEach(([key, value]) => {
                     if (typeof value === "object") {

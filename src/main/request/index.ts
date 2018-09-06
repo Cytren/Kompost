@@ -3,7 +3,6 @@ import {Validation, ValidationError, validateAndTransform} from "kompost-validat
 
 import ResponseError from "../response/response-error";
 import Context from "../context";
-import {AnyObject} from "../core/type";
 
 export type FailHandler = (error: string) => void;
 
@@ -17,8 +16,8 @@ export class BasicRequest<M> implements Request<M> {
     constructor (
         readonly type: new () => M,
         readonly validation: Validation,
-        readonly validateHandler: (model: AnyObject, fail: FailHandler, context: Context) => Promise<void>,
-        readonly buildHandler: (model: AnyObject, fail: FailHandler, context: Context) => Promise<M>
+        readonly validateHandler: (model: object, fail: FailHandler, context: Context) => Promise<void>,
+        readonly buildHandler: (model: object, fail: FailHandler, context: Context) => Promise<M>
     ) {}
 
     private fail (message: string) {

@@ -6,7 +6,7 @@ import {getInjection} from "../injection/injector";
 const ALGORITHM = "aes-256-cbc";
 const IV_LENGTH = 16;
 
-export function encrypt (item: Object) {
+export function encrypt (item: object) {
     const environment: Environment = getInjection(Environment);
 
     const iv = randomBytes(IV_LENGTH);
@@ -17,7 +17,7 @@ export function encrypt (item: Object) {
     return iv.toString('base64') + ':' + encrypted.toString('base64');
 }
 
-export function decrypt (item: string): Object {
+export function decrypt (item: string): object {
     const environment: Environment = getInjection(Environment);
 
     const items = item.split(':');
