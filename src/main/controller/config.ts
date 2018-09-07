@@ -15,7 +15,7 @@ export interface ParameterConfig {
 export interface EndpointConfig {
     path: string;
     method: MethodType;
-    request?: Request<any>;
+    request?: new (...args: any[]) => Request<any>;
     transformer?: Function;
     parameters?: ParameterConfig[];
     expose?: ExposeCondition;

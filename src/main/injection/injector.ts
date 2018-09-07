@@ -1,7 +1,7 @@
 
 import {getProvider} from "./providers";
 
-export function getInjection (type: any, nameOrNull?: string): any {
+export function getInjection <T> (type: new (...args: any[]) => T, nameOrNull?: string): T {
     const provider = getProvider(type, nameOrNull);
 
     if (!provider) {

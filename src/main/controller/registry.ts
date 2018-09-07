@@ -52,7 +52,7 @@ export default function setupControllers (router: KoaRouter, controllers: (new (
             routerFunction(path, async (context: Context) => {
                 const handler = async () => {
                     try {
-                        const request: Request<any> = endpointConfig.request;
+                        const request = endpointConfig.request && new endpointConfig.request;
                         const parameters = [];
 
                         for (let parameter of endpointConfig.parameters) {

@@ -6,19 +6,37 @@ import Context from "../context";
 
 export type FailHandler = (error: string) => void;
 
-export interface Request<M> {
-    readonly type: new () => M;
-    item (context: Context): Promise<M>;
-    collection (context: Context): Promise<M[]>;
-}
+export abstract class Request<M> implements Request<M> {
+    public abstract readonly type: new () => M;
+    protected abstract readonly validation: Validation = {};
+    protected readonly trueInstance = true;
 
-export class BasicRequest<M> implements Request<M> {
-    constructor (
-        readonly type: new () => M,
-        readonly validation: Validation,
-        readonly validateHandler: (model: object, fail: FailHandler, context: Context) => Promise<void>,
-        readonly buildHandler: (model: object, fail: FailHandler, context: Context) => Promise<M>
-    ) {}
+    protected createInstance (): M {
+        return new this.type();
+    }
+
+    protected async validate (model: any, fail: FailHandler, context: Context): Promise<void> {}
+
+    protected async build (model: any, fail: FailHandler, context: Context): Promise<M> {
+        if (!this.trueInstance) { return model as any; }
+
+        const process = <M> (model: object, result: M) => {
+            Object.entries(model)
+                .forEach(([key, value]) => {
+                    if (typeof value === "object") {
+                        result[key] = {};
+                        process(value, result[key]);
+                    } else {
+                        result[key] = value;
+                    }
+                });
+        };
+
+        const instance = this.createInstance();
+        process(model, instance);
+
+        return instance;
+    }
 
     private fail (message: string) {
         throw new ValidationError(message);
@@ -33,8 +51,8 @@ export class BasicRequest<M> implements Request<M> {
 
         try {
             const model = validateAndTransform(this.validation, data);
-            await this.validateHandler(model, this.fail, context);
-            return await this.buildHandler(model, this.fail, context);
+            await this.validate(model, this.fail, context);
+            return await this.build(model, this.fail, context);
         } catch (e) {
             if (!(e instanceof ValidationError)) { throw e; }
             const error = e as ValidationError;
@@ -51,8 +69,8 @@ export class BasicRequest<M> implements Request<M> {
                 const model = validateAndTransform(this.validation, data);
 
                 try {
-                    await this.validateHandler(model, this.fail, context);
-                    result.push(await this.buildHandler(model, this.fail, context));
+                    await this.validate(model, this.fail, context);
+                    result.push(await this.build(model, this.fail, context));
                 } catch (e) {
                     if (!(e instanceof ValidationError)) { throw e; }
                     const error = e as ValidationError;
