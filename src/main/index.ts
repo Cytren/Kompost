@@ -14,7 +14,7 @@ import {encrypt, decrypt} from "./core/encryption";
 
 import Middleware, {MiddlewareParams} from "./middleware";
 import {Validation, ValidationItem, ValidationError} from "kompost-validation";
-import {Request} from "./request";
+import {Request, FailHandler} from "./request";
 
 import Environment from "./context/environment";
 import Controller from "./controller";
@@ -35,7 +35,7 @@ export {
     Transformer, Request, Job, Context, Validation, ValidationItem,
     ContextProvider, BodyProvider, HeaderProvider, QueryProvider,
     ParamProvider, ResponseError, ValidationError, EndpointConfig,
-    MiddlewareParams,
+    MiddlewareParams, FailHandler,
 
     provideSingleton, provideDynamic, removeProvider, bootstrap,
     controller, get, post, put, del, inject, request, transform,
