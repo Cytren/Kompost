@@ -2,7 +2,6 @@
 import * as KoaRouter from "koa-router";
 import {getControllerConfig} from "./config";
 import {getInjection} from "../injection/injector";
-import {Request} from "../request";
 import {ValidationError} from "kompost-validation";
 import {MiddlewareProvider} from "../middleware";
 import Context from "../context";
@@ -124,7 +123,7 @@ export default function setupControllers (router: KoaRouter, controllers: (new (
 
                             const includeString: string = context.query["include"];
                             const includes = includeString ? includeString.split(",") : [];
-                            const transformer: Transformer<any> = new (endpointConfig.transformer as any)(includes);
+                            const transformer: Transformer<any> = new (endpointConfig.transformer as any)(includes, context);
 
                             if (result instanceof Paginated) {
                                 const data = await transformer.collection(result.data);

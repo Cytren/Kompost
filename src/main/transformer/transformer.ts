@@ -1,8 +1,9 @@
 
 import {getIncludes} from "./include-decorator";
+import Context from "../context";
 
 export default abstract class Transformer<M> {
-    public constructor (readonly includes: string[] = []) {}
+    public constructor (readonly includes: string[] = [], readonly context: Context) {}
 
     public async item (model: M): Promise<object> {
         return await this.internalTransform(model);
